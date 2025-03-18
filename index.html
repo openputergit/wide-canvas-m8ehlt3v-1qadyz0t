@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<style>
+    body {
+        font-family: 'Inter', sans-serif;
+    }
+    .modal {
+        transition: opacity 0.3s ease-in-out;
+    }
+</style>
+<body class="bg-gray-50">
+    <div class="min-h-screen">
+        <!-- Navigation -->
+        <nav class="bg-blue-600 text-white shadow-lg">
+            <div class="container mx-auto px-4 py-3">
+                <div class="flex justify-between items-center">
+                    <h1 class="text-xl font-bold">Inventory Management</h1>
+                    <div class="space-x-4">
+                        <button onclick="showAddItemModal()" class="bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50">
+                            <i class="bi bi-plus-lg"></i> Add Item
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="container mx-auto px-4 py-8">
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-gray-500 text-sm">Total Items</h3>
+                    <p class="text-3xl font-bold" id="totalItems">0</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-gray-500 text-sm">Inward Stock</h3>
+                    <p class="text-3xl font-bold text-green-600" id="inwardStock">0</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-gray-500 text-sm">Outward Stock</h3>
+                    <p class="text-3xl font-bold text-red-600" id="outwardStock">0</p>
+                </div>
+            </div>
+
+            <!-- Inventory Table -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="p-4 border-b">
+                    <h2 class="text-xl font-semibold">Inventory List</h2>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item Name</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Inward</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Outward</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Available</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryTable" class="bg-white divide-y divide-gray-200">
+                            <!-- Table rows will be inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+        <!-- Add Item Modal -->
+        <div id="addItemModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <div class="bg-white rounded-lg p-8 max-w-md w-full">
+                <h2 class="text-2xl font-bold mb-4">Add New Item</h2>
+                <form id="addItemForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Item Name</label>
+                        <input type="text" id="itemName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Category</label>
+                        <select id="itemCategory" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" required>
+                            <option value="Electronics">Electronics</option>
+                            <option value="Furniture">Furniture</option>
+                            <option value="Stationery">Stationery</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Quantity</label>
+                        <input type="number" id="itemQuantity" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Type</label>
+                        <select id="stockType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" required>
+                            <option value="inward">Inward</option>
+                            <option value="outward">Outward</option>
+                        </select>
+                    </div>
+                    <div class="flex justify-end space-x-3">
+                        <button type="button" onclick="hideAddItemModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Cancel</button>
+                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Add Item</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Store inventory data
+        let inventory = [];
+
+        // Show/Hide Modal
+        function showAddItemModal() {
+            document.getElementById('addItemModal').classList.remove('hidden');
+        }
+
+        function hideAddItemModal() {
+            document.getElementById('addItemModal').classList.add('hidden');
+        }
+
+        // Handle form submission
+        document.getElementById('addItemForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const itemName = document.getElementById('itemName').value;
+            const category = document.getElementById('itemCategory').value;
+            const quantity = parseInt(document.getElementById('itemQuantity').value);
+            const type = document.getElementById('stockType').value;
+
+            const existingItem = inventory.find(item => item.name === itemName);
+
+            if (existingItem) {
+                if (type === 'inward') {
+                    existingItem.inward += quantity;
+                } else {
+                    existingItem.outward += quantity;
+                }
+                existingItem.available = existingItem.inward - existingItem.outward;
+            } else {
+                const newItem = {
+                    name: itemName,
+                    category: category,
+                    inward: type === 'inward' ? quantity : 0,
+                    outward: type === 'outward' ? quantity : 0,
+                    available: type === 'inward' ? quantity : -quantity
+                };
+                inventory.push(newItem);
+            }
+
+            updateDisplay();
+            hideAddItemModal();
+            this.reset();
+        });
+
+        function deleteItem(index) {
+            inventory.splice(index, 1);
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            // Update stats
+            const totalItems = inventory.length;
+            const totalInward = inventory.reduce((sum, item) => sum + item.inward, 0);
+            const totalOutward = inventory.reduce((sum, item) => sum + item.outward, 0);
+
+            document.getElementById('totalItems').textContent = totalItems;
+            document.getElementById('inwardStock').textContent = totalInward;
+            document.getElementById('outwardStock').textContent = totalOutward;
+
+            // Update table
+            const tableBody = document.getElementById('inventoryTable');
+            tableBody.innerHTML = '';
+
+            inventory.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">${item.name}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${item.category}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-green-600">${item.inward}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-red-600">${item.outward}</td>
+                    <td class="px-6 py-4 whitespace-nowrap ${item.available >= 0 ? 'text-green-600' : 'text-red-600'}">${item.available}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <button onclick="deleteItem(${index})" class="text-red-600 hover:text-red-800">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Initial display update
+        updateDisplay();
+    </script>
+<script>document.body.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); return }, { passive: false })</script>
+	</body>
+</html>
